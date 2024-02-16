@@ -1,5 +1,6 @@
-import telebot
+from dotenv import dotenv_values
+from aiogram import *
 
-# from telebot import types
 
-bot = telebot.TeleBot(token='<KEY>', parse_mode='HTML')
+async def main():
+    bot = Bot(token=dotenv_values()["KEY"])
