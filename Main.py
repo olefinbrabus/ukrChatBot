@@ -1,6 +1,40 @@
-from dotenv import dotenv_values
-from aiogram import *
+import asyncio
+import logging
+import config
+
+from aiogram import Bot, Dispatcher
+from aiogram.enums.parse_mode import ParseMode
+from aiogram.fsm.storage.memory import MemoryStorage
+
+from views.handlers import router
 
 
 async def main():
-    bot = Bot(token=dotenv_values()["KEY"])
+
+    # data = await data_find()
+    # print(data)
+
+    """ starts the bot """
+    bot = Bot(token=config.BOT_TOKEN, parse_mode=ParseMode.HTML)
+    dp = Dispatcher(storage=MemoryStorage())
+    dp.include_router(router)
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
+
+""" entry point to api"""
+# async def data_find():
+#     async with httpx.AsyncClient() as c:
+#         url = "https://ukr-mova.in.ua/api-new?route=categories"
+#         response = await c.get(url)
+#         return response.json()
+
+if __name__ == '__main__':
+
+    logging.basicConfig(level=logging.INFO)
+    asyncio.run(main())
+
+
+
+    # print(dotenv_values()["KEY"])
+    # logging.basicConfig(level=logging.INFO)
+    # asyncio.run(main())
