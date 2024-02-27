@@ -9,3 +9,11 @@ cd ukrChatBot
 python -m venv venv
 pip install -r requirements.txt
 ```
+
+## Environment variables для локальної роботи
+- скопіювати .sample.env в .env та встановити необхідні значення
+
+## Запуск MognoDB
+```bash
+    docker-compose up -d
+
