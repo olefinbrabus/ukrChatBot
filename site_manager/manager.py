@@ -1,13 +1,17 @@
 import httpx
 import json
 
+from json import JSONDecodeError
 from bs4 import BeautifulSoup
-from io import BytesIO
-from PIL import Image
 from typing import Final
+from os import remove
 
 from config import SITE_API, SITE_URL
 
+"""
+В API сайту категорії розбиті по таким числам категорії,
+але вони не написані явно
+"""
 TYPE_OF_CATEGORIES: Final = {
     14: "Фразеологізми",
     37: "Орфографія",
@@ -23,43 +27,50 @@ TYPE_OF_CATEGORIES: Final = {
 
 
 class SiteManager:
-    def __init__(self, url: str) -> None:
-        self.proceed_data = url
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls, *args, **kwargs)
+        return cls._instance
 
     @property
     def proceed_data(self):
-        return self._proceed_data
-
-    @proceed_data.setter
-    def proceed_data(self, url: str) -> None:
-        response = httpx.get(url)
-        check_validation_status(response)
+        response = httpx.get(SITE_API)
+        _check_validation_status(response)
         new_json = response.json()
-        actual = actual_json()
+        actual = _validation_json()
         if new_json != actual:
-            create_or_overwrite_json(response)
-        self._proceed_data = json_request_handler(actual)
+            _create_or_overwrite_json(response)
+        return json_request_handler(actual)
+
+    def get_category(self, category: str):
+        data_in_category = []
+        identy = 0
+        for i, data in enumerate(self.proceed_data):
+            if data["category"] == category:
+                identy += 1
+                data["id_in_category"] = identy
+
+                data_in_category.append(data)
+
+        return data_in_category
 
 
-def check_validation_status(validation_status: httpx.Response) -> None:
+def _check_validation_status(validation_status: httpx.Response) -> None:
     if validation_status.status_code != 200:
         raise Exception('site didnt work')
 
 
-def photos_show(mngr: SiteManager, index: int) -> None:
-    index_dict = mngr.proceed_data[index]
-    img = httpx.get(index_dict["image"])
-    img = Image.open(BytesIO(img.content))
-    img.show()
-
-
-def remove_html_tags(html) -> str:
+def _remove_html_tags(html) -> str:
     soup = BeautifulSoup(html, 'html.parser')
 
     text = soup.get_text()
 
     text = text.replace('\n', "")
     text = text.replace('\xa0', "")
+    text = text.replace(';', "\n")
+    text = text.replace(':', ":\n")
     return text
 
 
@@ -69,7 +80,7 @@ def json_request_handler(file: list) -> list:
     sorted_data = []
 
     for message in data:
-        msg = remove_html_tags(message["content"])
+        msg = _remove_html_tags(message["content"])
         sorted_data.append(
             {
                 "id": message["id"],
@@ -84,29 +95,29 @@ def json_request_handler(file: list) -> list:
     return sorted_data
 
 
-def actual_json():
+def _validation_json():
     try:
-        with open("data.json", "r") as file:
-            data_file = json.load(file)
+        _read_json()
 
     except FileNotFoundError:
-        response = httpx.get(SITE_URL)
-        create_or_overwrite_json(response)
-        with open('data.json', 'r') as data:
-            data_file = json.load(data)
+        response = httpx.get(SITE_API)
+        _create_or_overwrite_json(response)
+
+    except JSONDecodeError:
+        response = httpx.get(SITE_API)
+        _create_or_overwrite_json(response)
+
+    finally:
+        data_file = _read_json()
 
     return data_file
 
 
-def create_or_overwrite_json(response: httpx.Response) -> None:
+def _read_json():
+    with open('data.json', 'r') as file:
+        return json.load(file)
+
+
+def _create_or_overwrite_json(response: httpx.Response) -> None:
     with open('data.json', 'w') as data:
         json.dump(response.json(), data, ensure_ascii=False)
-
-
-if __name__ == "__main__":
-    manager = SiteManager(SITE_API)
-
-    for data in manager.proceed_data:
-        print(data)
-
-
