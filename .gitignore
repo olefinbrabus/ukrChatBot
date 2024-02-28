@@ -1,1 +1,5 @@
 .idea/
+.env
+site_manager/data.json
+ukrChatBot.egg-info
+data.json
