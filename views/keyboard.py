@@ -1,7 +1,7 @@
 from aiogram.types import (InlineKeyboardMarkup, InlineKeyboardButton, KeyboardButton,
                            ReplyKeyboardMarkup, ReplyKeyboardRemove)
 
-from site_manager.manager import TYPE_OF_CATEGORIES
+from controller.main_controller import MainController
 
 main = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text="🗓️ Словосполучення/слово дня")],
@@ -14,7 +14,7 @@ main = ReplyKeyboardMarkup(keyboard=[
 """Створення категорій частин мови"""
 categories = []
 
-from_dict = list(TYPE_OF_CATEGORIES.values())
+from_dict = MainController().get_categories
 
 for category in range(0, len(from_dict), 2):
     list_category = [KeyboardButton(text=from_dict[category]),
