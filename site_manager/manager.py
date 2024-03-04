@@ -1,33 +1,26 @@
 import httpx
-import json
-
-from json import JSONDecodeError
 from bs4 import BeautifulSoup
-from typing import Final
-from os import remove
+from dataclasses import dataclass, asdict
 
-from config import SITE_API, SITE_URL
+from config import SITE_API_EXAMPLES, SITE_API_CATEGORIES, SITE_URL
 
-"""
-В API сайту категорії розбиті по таким числам категорії,
-але вони не написані явно
-"""
-TYPE_OF_CATEGORIES: Final = {
-    14: "Фразеологізми",
-    37: "Орфографія",
-    38: "Антисуржик",
-    42: "Синоніми",
-    58: "Пароніми",
-    73: "Інше",
-    83: "Цитати",
-    85: "Для дітей",
-    87: "Наголос",
-    617: "Правопис 2019",
-}
+
+@dataclass
+class Examples:
+    _id: int
+    category_id: int
+    category_name: str
+    title: str
+    content: str
+    image: str
+    url: str
 
 
 class SiteManager:
     _instance = None
+
+    examples_from_site = httpx.get(SITE_API_EXAMPLES).json()
+    categories_from_site = httpx.get(SITE_API_CATEGORIES).json()
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -35,26 +28,46 @@ class SiteManager:
         return cls._instance
 
     @property
-    def proceed_data(self):
-        response = httpx.get(SITE_API)
-        _check_validation_status(response)
-        new_json = response.json()
-        actual = _validation_json()
-        if new_json != actual:
-            _create_or_overwrite_json(response)
-        return json_request_handler(actual)
+    def get_proceed_examples(self):
+        data = self._json_request_handler()
 
-    def get_category(self, category: str):
-        data_in_category = []
-        identy = 0
-        for i, data in enumerate(self.proceed_data):
-            if data["category"] == category:
-                identy += 1
-                data["id_in_category"] = identy
+        return [asdict(example) for example in data]
 
-                data_in_category.append(data)
+    @property
+    def get_proceed_categories(self):
+        return self._json_categories_handler()
 
-        return data_in_category
+    def _json_request_handler(self) -> list:
+
+        name_of_category = self._json_categories_handler()
+
+        unsorted_data = sorted(self.examples_from_site, key=lambda x: x["category"])
+
+        sorted_data = []
+
+        for i, message in enumerate(unsorted_data):
+            msg = _remove_html_tags(message["content"])
+
+            sorted_data.append(
+                Examples(
+                    _id=i,
+                    category_id=message["category"],
+                    category_name=name_of_category[message["category"]],
+                    title=message["title"],
+                    content=msg,
+                    image=SITE_URL + message["image"],
+                    url=SITE_URL + message["uri"]
+                )
+            )
+
+        return sorted_data
+
+    def _json_categories_handler(self) -> dict:
+        list_categories = {}
+        for category in self.categories_from_site:
+            list_categories[category["id"]] = category["title"]
+
+        return list_categories
 
 
 def _check_validation_status(validation_status: httpx.Response) -> None:
@@ -74,50 +87,7 @@ def _remove_html_tags(html) -> str:
     return text
 
 
-def json_request_handler(file: list) -> list:
-    data = sorted(file, key=lambda x: x["category"])
-
-    sorted_data = []
-
-    for message in data:
-        msg = _remove_html_tags(message["content"])
-        sorted_data.append(
-            {
-                "id": message["id"],
-                "category_id": message["category"],
-                "category": TYPE_OF_CATEGORIES[message["category"]],
-                "title": message["title"],
-                "content": msg,
-                "image": SITE_URL + message["image"],
-                "url": SITE_URL + message["uri"]
-            }
-        )
-    return sorted_data
-
-
-def _validation_json():
-    try:
-        _read_json()
-
-    except FileNotFoundError:
-        response = httpx.get(SITE_API)
-        _create_or_overwrite_json(response)
-
-    except JSONDecodeError:
-        response = httpx.get(SITE_API)
-        _create_or_overwrite_json(response)
-
-    finally:
-        data_file = _read_json()
-
-    return data_file
-
-
-def _read_json():
-    with open('data.json', 'r') as file:
-        return json.load(file)
-
-
-def _create_or_overwrite_json(response: httpx.Response) -> None:
-    with open('data.json', 'w') as data:
-        json.dump(response.json(), data, ensure_ascii=False)
+if __name__ == "__main__":
+    site_manager = SiteManager()
+    print(site_manager.get_proceed_examples)
+    print(site_manager.get_proceed_categories)
