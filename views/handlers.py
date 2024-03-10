@@ -7,6 +7,7 @@ import views.text
 import datetime
 
 from controller.main_controller import MainController
+from controller.log_controller import message_format_to_logging
 
 router = Router()
 data_category = None
@@ -14,6 +15,7 @@ data_category = None
 
 @router.message(Command("start"))
 async def start_handler(msg: Message):
+    message_format_to_logging(msg, f"start {msg.from_user.first_name}")
     await msg.answer(views.text.greet.format(
         name=msg.from_user.full_name),
         reply_markup=views.keyboard.main)
@@ -23,6 +25,7 @@ async def start_handler(msg: Message):
 @router.message(F.text == "меню")
 @router.message(F.text == "До меню")
 async def menu_handler(msg: Message):
+    message_format_to_logging(msg, "Menu")
     await msg.answer(
         views.text.menu,
         reply_markup=views.keyboard.main)
@@ -30,12 +33,14 @@ async def menu_handler(msg: Message):
 
 @router.message(F.text == "🔎 Допомога")
 async def help_handler(msg: Message):
+    message_format_to_logging(msg, "Help")
     await msg.answer(views.text.help_bot,
                      reply_markup=views.keyboard.main)
 
 
 @router.message(F.text == "📝 Пошук правила")
 async def categories_handler(msg: Message):
+    message_format_to_logging(msg, "Show categories")
     await msg.answer("Виберіть категорію",
                      reply_markup=views.keyboard.categories)
 
@@ -66,11 +71,14 @@ async def categories_contains_handler(msg: Message):
 
         for data in data_category:
             number += f"\n {data["id"]+1} - {data["title"]}"
+        message_format_to_logging(msg, "Categories")
         await msg.answer(number, reply_markup=views.keyboard.main)
 
     else:
+        text = "Помилка, такої команди не існує, спробуйте іншу."
+        message_format_to_logging(msg, "Wrong command")
         await msg.answer(
-            text="Помилка, такої команди не існує, спробуйте іншу.",
+            text=text,
             reply_markup=views.keyboard.main
         )
 
@@ -82,17 +90,21 @@ async def show_data(msg: Message, data: list, index: int):
 
         data = data[index]
         image = URLInputFile(data["image"])
+        text_to_answer = f"{data["title"]}\n\n" \
+                         f"{data["category_name"]}\n\n" \
+                         f"{data["content"]}\n\n" \
+                         f"{data["url"]}"
 
+        message_format_to_logging(msg, data["title"])
         await msg.answer_photo(
             photo=image,
-            caption=f"{data["title"]}\n\n"
-                    f"{data["category_name"]}\n\n"
-                    f"{data["content"]}\n\n"
-                    f"{data["url"]}",
+            caption=text_to_answer,
             disable_web_page_preview=True
         )
         if msg.text != "🗓️ Словосполучення/слово дня":
             await msg.answer("Напишить номер якій вас цікавить\n"
                              "або вийдіть до категорії чи меню")
     except IndexError:
+
+        message_format_to_logging(msg, "Wrong index")
         await msg.answer("Помилка. неправильний номер. Спробуйте ще раз.")
