@@ -8,8 +8,9 @@ class DatabaseManagerExamples(AbstractDatabase):
 
     def update_db(self, list_examples: list) -> None:
         if not self._validate_db(list_examples):
-            self._drop_collection()
+            self.drop_collection()
             self.insert(list_examples)
 
     def _validate_db(self, list_examples: list) -> bool:
         return self.get_collection() == list_examples
+

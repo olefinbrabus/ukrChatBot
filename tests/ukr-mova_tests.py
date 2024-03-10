@@ -1,7 +1,5 @@
 import unittest
 
-from os import remove
-
 from site_manager.manager import SiteManager
 
 
@@ -10,14 +8,14 @@ class TestCategories(unittest.TestCase):
         self.manager = SiteManager()
 
     def test_phraseological_unit(self):
-        categories = self.manager.get_category("Фразеологізми")
-        remove('data.json')
-        self.assertEqual(len(categories), 93)
+        examples = self.manager.get_proceed_examples
+
+        examples = [x for x in examples if x["category_name"] == "Фразеологізми"]
+        self.assertEqual(len(examples), 93)
 
     def test_quotes(self):
-        categories = self.manager.get_category("Цитати")
-        remove('data.json')
-        self.assertEqual(len(categories), 22)
+        categories = self.manager.get_proceed_categories
+        self.assertEqual(len(categories), 10)
 
 
 if __name__ == '__main__':
