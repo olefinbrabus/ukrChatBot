@@ -86,8 +86,3 @@ def _remove_html_tags(html) -> str:
     text = text.replace(':', ":\n")
     return text
 
-
-if __name__ == "__main__":
-    site_manager = SiteManager()
-    print(site_manager.get_proceed_examples)
-    print(site_manager.get_proceed_categories)
