@@ -6,6 +6,8 @@ from aiogram import Bot, Dispatcher
 from aiogram.enums.parse_mode import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 
+from database.db_manager_examples import DatabaseManagerExamples
+from site_manager.manager import SiteManager
 from views.handlers import router
 
 
@@ -20,7 +22,15 @@ async def main():
         allowed_updates=dp.resolve_used_update_types())
 
 
+def initialize_db():
+    manager = SiteManager()
+    examples = DatabaseManagerExamples("examples")
+    examples.update_db(manager.get_proceed_examples)
+
+
+
 if __name__ == '__main__':
+    initialize_db()
     logging.basicConfig(level=logging.INFO)
     asyncio.run(main())
 

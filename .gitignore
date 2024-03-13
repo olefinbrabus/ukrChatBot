@@ -4,3 +4,4 @@ ukrChatBot.egg-info
 .DS_Store
 /__pycache__
 __pycache__
+database_data

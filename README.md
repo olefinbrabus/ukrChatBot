@@ -47,5 +47,3 @@ python main.py
 docker-compose build
 docker-compose up
 ```
-
-
