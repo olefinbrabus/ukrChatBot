@@ -7,7 +7,7 @@ class AbstractDatabase:
     def __init__(self, collection: str) -> None:
         from pymongo.errors import PyMongoError
         try:
-            self._client = pymongo.MongoClient(MONGO_CLIENT)  # serverSelectionTimeoutMS=2000
+            self._client = pymongo.MongoClient(MONGO_CLIENT)
             self._database = self._client[MONGO_DATABASE]
             self._collection = self._database[collection]
         except pymongo.errors.ServerSelectionTimeoutError as e:

@@ -13,4 +13,3 @@ class DatabaseManagerExamples(AbstractDatabase):
 
     def _validate_db(self, list_examples: list) -> bool:
         return self.get_collection() == list_examples
-
