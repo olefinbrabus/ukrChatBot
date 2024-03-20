@@ -2,12 +2,12 @@ import unittest
 
 from math import sqrt
 
-from database.db_manager_examples import DatabaseManagerExamples
+from database.db_manager_rules import DatabaseManagerRules
 
 
 class DatabaseTests(unittest.TestCase):
     def setUp(self):
-        self.db_manager = DatabaseManagerExamples("test")
+        self.db_manager = DatabaseManagerRules("test")
 
     def tearDown(self):
 

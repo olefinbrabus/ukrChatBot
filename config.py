@@ -11,6 +11,3 @@ SITE_API_CATEGORIES = "https://ukr-mova.in.ua/api-new?route=categories"
 
 MONGO_CLIENT = f"mongodb://{MONGODB_USERNAME}:{MONGODB_PASSWORD}@mongodb:27017/"
 MONGO_DATABASE = "urkChatBot"
-
-if __name__ == "__main__":
-    print(MONGO_CLIENT)

@@ -6,7 +6,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.enums.parse_mode import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 
-from database.db_manager_examples import DatabaseManagerExamples
+from database.db_manager_rules import DatabaseManagerRules
 from site_manager.manager import SiteManager
 from views.handlers import router
 
@@ -24,9 +24,8 @@ async def main():
 
 def initialize_db():
     manager = SiteManager()
-    examples = DatabaseManagerExamples("examples")
-    examples.update_db(manager.get_proceed_examples)
-
+    examples = DatabaseManagerRules("examples")
+    examples.update_db(manager.get_proceed_rules)
 
 
 if __name__ == '__main__':

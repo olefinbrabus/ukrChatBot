@@ -8,8 +8,7 @@ class TestCategories(unittest.TestCase):
         self.manager = SiteManager()
 
     def test_phraseological_unit(self):
-        examples = self.manager.get_proceed_examples
-
+        examples = self.manager.get_proceed_rules
         examples = [x for x in examples if x["category_name"] == "Фразеологізми"]
         self.assertEqual(len(examples), 93)
 

@@ -1,11 +1,11 @@
-from database.db_manager_examples import DatabaseManagerExamples
+from database.db_manager_rules import DatabaseManagerRules
 from site_manager.manager import SiteManager
 
 
 class MainController:
     _instance = None
 
-    _database_manager = DatabaseManagerExamples("examples")
+    _database_manager = DatabaseManagerRules("examples")
     _site_manager = SiteManager()
 
     def __new__(cls, *args, **kwargs):

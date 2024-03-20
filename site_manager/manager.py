@@ -6,7 +6,7 @@ from config import SITE_API_EXAMPLES, SITE_API_CATEGORIES, SITE_URL
 
 
 @dataclass
-class Examples:
+class RulesUkrMovaApiParam:
     _id: int
     category_id: int
     category_name: str
@@ -28,7 +28,7 @@ class SiteManager:
         return cls._instance
 
     @property
-    def get_proceed_examples(self):
+    def get_proceed_rules(self):
         data = self._json_request_handler()
 
         return [asdict(example) for example in data]
@@ -38,18 +38,15 @@ class SiteManager:
         return self._json_categories_handler()
 
     def _json_request_handler(self) -> list:
-
         name_of_category = self._json_categories_handler()
+        sorted_data = sorted(self.examples_from_site, key=lambda x: x["category"])
 
-        unsorted_data = sorted(self.examples_from_site, key=lambda x: x["category"])
-
-        sorted_data = []
-
-        for i, message in enumerate(unsorted_data):
+        data = []
+        for i, message in enumerate(sorted_data):
             msg = _remove_html_tags(message["content"])
 
-            sorted_data.append(
-                Examples(
+            data.append(
+                RulesUkrMovaApiParam(
                     _id=i,
                     category_id=message["category"],
                     category_name=name_of_category[message["category"]],
@@ -60,7 +57,7 @@ class SiteManager:
                 )
             )
 
-        return sorted_data
+        return data
 
     def _json_categories_handler(self) -> dict:
         list_categories = {}
@@ -70,14 +67,13 @@ class SiteManager:
         return list_categories
 
 
-def _check_validation_status(validation_status: httpx.Response) -> None:
-    if validation_status.status_code != 200:
-        raise Exception('site didnt work')
+# def _check_validation_status(validation_status: httpx.Response) -> None:
+#     if validation_status.status_code != 200:
+#         raise Exception('site didnt work')
 
 
 def _remove_html_tags(html) -> str:
     soup = BeautifulSoup(html, 'html.parser')
-
     text = soup.get_text()
 
     text = text.replace('\n', "")

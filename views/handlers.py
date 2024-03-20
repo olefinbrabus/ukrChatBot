@@ -1,10 +1,11 @@
+import datetime
+
 from aiogram import F, Router
 from aiogram.types import Message, URLInputFile
 from aiogram.filters import Command
 
 import views.keyboard
 import views.text
-import datetime
 
 from controller.main_controller import MainController
 from controller.log_controller import message_format_to_logging
@@ -18,7 +19,8 @@ async def start_handler(msg: Message):
     message_format_to_logging(msg, f"start {msg.from_user.first_name}")
     await msg.answer(views.text.greet.format(
         name=msg.from_user.full_name),
-        reply_markup=views.keyboard.main)
+        reply_markup=views.keyboard.main
+    )
 
 
 @router.message(F.text == "Меню")
@@ -26,30 +28,25 @@ async def start_handler(msg: Message):
 @router.message(F.text == "До меню")
 async def menu_handler(msg: Message):
     message_format_to_logging(msg, "Menu")
-    await msg.answer(
-        views.text.menu,
-        reply_markup=views.keyboard.main)
+    await msg.answer( views.text.menu, reply_markup=views.keyboard.main)
 
 
 @router.message(F.text == "🔎 Допомога")
 async def help_handler(msg: Message):
     message_format_to_logging(msg, "Help")
-    await msg.answer(views.text.help_bot,
-                     reply_markup=views.keyboard.main)
+    await msg.answer(views.text.help_bot, reply_markup=views.keyboard.main)
 
 
 @router.message(F.text == "📝 Пошук правила")
 async def categories_handler(msg: Message):
     message_format_to_logging(msg, "Show categories")
-    await msg.answer("Виберіть категорію",
-                     reply_markup=views.keyboard.categories)
+    await msg.answer("Виберіть категорію", reply_markup=views.keyboard.categories)
 
 
 @router.message(F.text == "🗓️ Словосполучення/слово дня")
 async def word_of_day_handler(msg: Message):
     controller = MainController()
-    index = (datetime.datetime.now().day * 2
-             // datetime.datetime.now().month)
+    index = (datetime.datetime.now().day * 2 // datetime.datetime.now().month)
     indexed_data = controller.get_examples
     await show_data(msg, indexed_data, index)
 
@@ -77,10 +74,7 @@ async def categories_contains_handler(msg: Message):
     else:
         text = "Помилка, такої команди не існує, спробуйте іншу."
         message_format_to_logging(msg, "Wrong command")
-        await msg.answer(
-            text=text,
-            reply_markup=views.keyboard.main
-        )
+        await msg.answer(text=text, reply_markup=views.keyboard.main)
 
 
 async def show_data(msg: Message, data: list, index: int):
@@ -105,6 +99,5 @@ async def show_data(msg: Message, data: list, index: int):
             await msg.answer("Напишить номер якій вас цікавить\n"
                              "або вийдіть до категорії чи меню")
     except IndexError:
-
         message_format_to_logging(msg, "Wrong index")
         await msg.answer("Помилка. неправильний номер. Спробуйте ще раз.")
