@@ -1,11 +1,13 @@
 import pymongo
 
+from pymongo.errors import PyMongoError
+
 from config import MONGO_CLIENT, MONGO_DATABASE
 
 
 class AbstractDatabase:
     def __init__(self, collection: str) -> None:
-        from pymongo.errors import PyMongoError
+
         try:
             self._client = pymongo.MongoClient(MONGO_CLIENT)
             self._database = self._client[MONGO_DATABASE]
@@ -25,16 +27,14 @@ class AbstractDatabase:
 
     def get_collection(self, find_filter: dict = None):
         if find_filter is None:
-            lst = [ex for ex in self._collection.find()]
-            return lst
+            return [rules for rules in self._collection.find()]
 
-        data = enumerate(self._collection.find(
-            find_filter, {"_id": 0}))
-        return [{"id": i, **ex} for i, ex in data]
+        data = enumerate(self._collection.find(find_filter, {"_id": 0}))
+        return [{"id": i, **collection} for i, collection in data]
 
 
-def _insert_validation_form(lst: list) -> bool:
-    for example in lst:
+def _insert_validation_form(collection: list) -> bool:
+    for example in collection:
         if not isinstance(example, dict):
             return False
     return True

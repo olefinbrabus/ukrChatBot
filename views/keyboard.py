@@ -17,8 +17,9 @@ categories = []
 from_dict = MainController().get_categories
 
 for category in range(0, len(from_dict), 2):
-    list_category = [KeyboardButton(text=from_dict[category]),
-                     KeyboardButton(text=from_dict[category + 1])]
+    list_category = [
+        KeyboardButton(text=from_dict[category]), KeyboardButton(text=from_dict[category + 1])
+    ]
     categories.append(list_category)
 
 categories.append([KeyboardButton(text="До меню")])
