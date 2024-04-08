@@ -1,0 +1,45 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+
+  test:
+    runs-on: ubuntu-lastes
+    services:
+      mongo:
+        image: mongo:latest
+        ports:
+          - "27017:27017"
+        env:
+          MONGODB_USERNAME: root
+          MONGODB_PASSWORD: example
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-lastes
+    if: github.ref == 'refs/heads/main'
+    steps: 
+      - name: Run command on remote server
+        uses: D3rHase/ssh-command-action@v0.2.2
+        with:
+          host: ${{secrets.SSH_HOST}}
+          user: ${{secrets.SSH_USER}}
+          private_key: ${{secrets.SSH_PRIVATE_KEY}}
+          command: |
+            git clone  https://github.com/olefinbrabus/ukrChatBot
+            cd ukrChatBot
+            python -m venv venv
+            pip install .
+    
+   
