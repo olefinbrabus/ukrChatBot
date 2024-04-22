@@ -23,9 +23,10 @@ async def main():
 
 
 def initialize_db():
-    manager = SiteManager()
-    examples = DatabaseManagerRules("examples")
-    examples.update_db(manager.get_proceed_rules)
+    if config.AUTH_INCLUDED:
+        manager = SiteManager()
+        examples = DatabaseManagerRules("examples")
+        examples.update_db(manager.get_proceed_rules)
 
 
 if __name__ == '__main__':

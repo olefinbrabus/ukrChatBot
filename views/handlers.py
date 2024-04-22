@@ -9,6 +9,8 @@ import views.text
 
 from controller.main_controller import MainController
 from controller.log_controller import message_format_to_logging
+from auth.authorize import login_required
+
 
 router = Router()
 data_category = None
@@ -26,9 +28,10 @@ async def start_handler(msg: Message):
 @router.message(F.text == "Меню")
 @router.message(F.text == "меню")
 @router.message(F.text == "До меню")
+@login_required
 async def menu_handler(msg: Message):
     message_format_to_logging(msg, "Menu")
-    await msg.answer( views.text.menu, reply_markup=views.keyboard.main)
+    await msg.answer(views.text.menu, reply_markup=views.keyboard.main)
 
 
 @router.message(F.text == "🔎 Допомога")
