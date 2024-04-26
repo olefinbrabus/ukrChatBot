@@ -1,5 +1,4 @@
-from aiogram.types import (InlineKeyboardMarkup, InlineKeyboardButton, KeyboardButton,
-                           ReplyKeyboardMarkup, ReplyKeyboardRemove)
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
 from controller.main_controller import MainController
 
