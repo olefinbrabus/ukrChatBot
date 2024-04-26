@@ -2,6 +2,5 @@
 .env
 ukrChatBot.egg-info
 .DS_Store
-/__pycache__
-__pycache__
-database_data
+**/__pycache__
+/database-data/
