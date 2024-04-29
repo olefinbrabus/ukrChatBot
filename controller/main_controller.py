@@ -14,13 +14,13 @@ class MainController:
         return cls._instance
 
     @property
-    def get_categories(self):
+    def get_categories(self) -> list[str]:
         return list([x for x in self._site_manager.
                     get_proceed_categories.values()])
 
     @property
-    def get_examples(self):
+    def get_examples(self) -> list[dict]:
         return self._database_manager.get_collection()
 
-    def get_filter_examples(self, category: dict):
+    def get_filter_examples(self, category: dict) -> list[dict]:
         return self._database_manager.get_collection(category)
