@@ -15,7 +15,7 @@ jobs:
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
 
   test:
-    runs-on: ubuntu-lastes
+    runs-on: ubuntu-latest
     services:
       mongo:
         image: mongo:latest
@@ -27,19 +27,26 @@ jobs:
 
   deploy:
     needs: test
-    runs-on: ubuntu-lastes
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps: 
-      - name: Run command on remote server
-        uses: D3rHase/ssh-command-action@v0.2.2
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.3
         with:
-          host: ${{secrets.SSH_HOST}}
-          user: ${{secrets.SSH_USER}}
-          private_key: ${{secrets.SSH_PRIVATE_KEY}}
-          command: |
-            git clone  https://github.com/olefinbrabus/ukrChatBot
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Run command on remote server
+        uses: appleboy/ssh-action@master
+        with:
+          MONGODB_PASSWORD: ${{ secrets.SSH_MONGO_PASSWORD }}
+          MONGODB_USERNAME: ${{ secrets.SSH_MONGO_USER }}
+          KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            git clone https://github.com/olefinbrabus/ukrChatBot
             cd ukrChatBot
             python -m venv venv
+            . venv/bin/activate
             pip install .
+
     
    
