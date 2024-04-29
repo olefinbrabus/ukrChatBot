@@ -1,0 +1,49 @@
+name: Docker Image CI
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+
+  test:
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:latest
+        ports:
+          - "27017:27017"
+        env:
+          MONGODB_USERNAME: root
+          MONGODB_PASSWORD: example
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps: 
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Run command on remote server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          port: 22
+          script: |
+            ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+            git clone https://github.com/olefinbrabus/ukrChatBot
+            cd ukrChatBot
+            python -m venv venv
+            source venv/bin/activate
+            pip install .
+
