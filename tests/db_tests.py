@@ -1,5 +1,4 @@
 import unittest
-
 from math import sqrt
 
 from database.db_manager_rules import DatabaseManagerRules

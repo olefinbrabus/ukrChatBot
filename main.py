@@ -1,11 +1,11 @@
-import asyncio
 import logging
-import config
 
+import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.enums.parse_mode import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 
+import config
 from database.db_manager_rules import DatabaseManagerRules
 from site_manager.manager import SiteManager
 from views.handlers import router

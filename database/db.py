@@ -1,12 +1,11 @@
 import pymongo
-
 from pymongo.errors import PyMongoError
 
 from config import MONGO_CLIENT, MONGO_DATABASE
 
 
 class AbstractDatabase:
-    def __init__(self, collection: str) -> None:
+    def __init__(self, collection: str):
 
         try:
             self._client = pymongo.MongoClient(MONGO_CLIENT)
@@ -25,7 +24,7 @@ class AbstractDatabase:
     def drop_collection(self) -> None:
         self._collection.drop()
 
-    def get_collection(self, find_filter: dict = None):
+    def get_collection(self, find_filter: dict = None) -> list[dict]:
         if find_filter is None:
             return [rules for rules in self._collection.find()]
 

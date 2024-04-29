@@ -1,10 +1,9 @@
-import config
-
 from datetime import datetime
 from dataclasses import dataclass, asdict
 
 from aiogram.types import Message
 
+import config
 from database.db_logs import DatabaseLogs as Db
 
 
@@ -30,7 +29,3 @@ def message_format_to_logging(msg: Message, answer: str = "") -> None:
             time=datetime.now().strftime("%H:%M:%S, %m/%d/%Y")
         )
         _database.insert_one(asdict(log))
-
-
-
-
