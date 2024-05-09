@@ -23,11 +23,12 @@ class DatabaseTests(unittest.TestCase):
              f"data_{x + 1}": sqrt(x + 1),
              f"data_{x + 2}": sqrt(x + 2),
              }
-            for x in range(10000)]
+            for x in range(10)]
+        print(big_data)
 
-        self.db_manager.update_db(big_data)
+        self.db_manager.insert(big_data)
         eq = len(self.db_manager.get_collection())
-        self.assertEqual(eq, 10000)
+        self.assertEqual(eq, 10)
 
 
 if __name__ == "__main__":

@@ -22,5 +22,11 @@ class MainController:
     def get_examples(self) -> list[dict]:
         return self._database_manager.get_collection()
 
+    def get_example(self, title: str) -> dict:
+        collection = self._database_manager.get_collection()
+        for example in collection:
+            if example['title'].lower() == title.lower():
+                return example
+
     def get_filter_examples(self, category: dict) -> list[dict]:
         return self._database_manager.get_collection(category)
