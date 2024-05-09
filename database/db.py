@@ -1,5 +1,5 @@
 import pymongo
-from pymongo.errors import PyMongoError
+from pymongo.errors import ServerSelectionTimeoutError
 
 from config import MONGO_CLIENT, MONGO_DATABASE
 
@@ -11,7 +11,8 @@ class AbstractDatabase:
             self._client = pymongo.MongoClient(MONGO_CLIENT)
             self._database = self._client[MONGO_DATABASE]
             self._collection = self._database[collection]
-        except pymongo.errors.ServerSelectionTimeoutError as e:
+            self.get_collection()
+        except ServerSelectionTimeoutError as e:
             print(e)
             raise
 
@@ -37,3 +38,4 @@ def _insert_validation_form(collection: list) -> bool:
         if not isinstance(example, dict):
             return False
     return True
+

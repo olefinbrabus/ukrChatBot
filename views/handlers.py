@@ -73,17 +73,22 @@ async def menu_handler(msg: Message):
 async def any_text_handler(msg: Message):
     if msg.chat.type == "private":
         global data_category
-        category = msg.text
+        text = msg.text
+        controller = MainController()
 
-        if category.isdigit() and data_category is not None:
-            i = int(category) - 1  # index -1 because the array starts from zero
+        example = controller.get_example(text)
+        if example:
+            await show_data(msg, [example], 0)
+
+        elif text.isdigit() and data_category is not None:
+            i = int(text) - 1  # index -1 because the array starts from zero
             await show_data(msg, data_category, i)
 
-        elif category in MainController().get_categories:
+        elif text in controller.get_categories:
             number = "Напишіть словосполучення по номеру 👇"
 
-            data = {"category_name": category}
-            data_category = MainController().get_filter_examples(data)
+            data = {"category_name": text}
+            data_category = controller.get_filter_examples(data)
 
             for data in data_category:
                 number += f"\n {data["id"] + 1} - {data["title"]}"
@@ -118,7 +123,7 @@ async def show_data(msg: Message, data: list, index: int):
             caption=text_to_answer,
             disable_web_page_preview=True
         )
-        if msg.text != "🗓️ Словосполучення/слово дня":
+        if msg.text != "🗓️ Словосполучення/слово дня" and len(data) != 6:
             await msg.answer("Напишить номер якій вас цікавить\n"
                              "або вийдіть до категорії чи меню")
     except IndexError:
