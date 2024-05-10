@@ -25,7 +25,7 @@ class MainController:
     def get_example(self, title: str) -> dict:
         collection = self._database_manager.get_collection()
         for example in collection:
-            if example['title'].lower() == title.lower():
+            if title.lower() in example['title'].lower():
                 return example
 
     def get_filter_examples(self, category: dict) -> list[dict]:
